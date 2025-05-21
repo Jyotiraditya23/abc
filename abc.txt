@@ -1,4 +1,11 @@
-﻿Q: Draw an ER for Bank database with atleast 5 entities and convert them into tables.
+nmcli connection show
+nmcli connection delete "Jodd-CS"
+history -c
+
+
+
+
+Q: Draw an ER for Bank database with atleast 5 entities and convert them into tables.
 Perform DDL on above converted tables.
 1.Create tables with all constraints
 2. Create views on any two tables using join conditions
@@ -194,6 +201,32 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE TRIGGER fine
+after update on libra
+for each row
+begin
+	declare countD int;
+    set countD = DATEDIFF(curdate(),new.doi);
+    
+    if countD > 20 then
+		-- Update libra set bstatus = 'FINE' where bid = new.bid;
+        
+        update libraryAudit
+        set fine = countD*10,tsq = NOW()
+        where bid=new.bid;
+	end if;
+end$$
+
+DELIMITER ;
+
+insert into libra(bid,bname,doi,bstatus) values(101,'dbms',curdate(),'ISSUE'),(102,'COMT',curdate(),'RETURN'),(103, 'CN', CURDATE() - INTERVAL 25 DAY, 'RETURN');
+UPDATE Libra SET bstatus = 'RETURN' WHERE bid = 103;
+select * from libraryAudit;
+
 
 -- 6. Insert sample data
 INSERT INTO lib(bid, bname, doi, bstatus) VALUES
